@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('Адмінпанель - Головна') }}{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">📊 {{ t('Панель управління') }}</h1>
+    <div class="row">
+        <!-- Статистика -->
+        <div class="col-md-4 mb-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="dashboard-card">{{ t('Замовлень всього') }}</h5>
+                    <h2>{{ total_orders }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="dashboard-card">{{ t('Очікують обробки') }}</h5>
+                    <h2>{{ pending_orders }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="dashboard-card">{{ t('Страв в меню') }}</h5>
+                    <h2>{{ active_menu_items }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="dashboard-card">{{ t('Швидкі дії') }}</h5>
+                    <div class="d-grid gap-2 d-md-flex">
+                        <a href="{{ url_for('admin.menu_management') }}" class="btn btn-primary me-2">
+                            🍣 {{ t('Управління меню') }}
+                        </a>
+                        <a href="{{ url_for('admin.orders_management') }}" class="btn btn-success me-2">
+                            📦 {{ t('Управління замовленнями') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

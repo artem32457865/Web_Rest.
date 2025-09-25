@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('Кошик') }} - {{ t('Суши-бар - IZI') }}{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">🛒 {{ t('Ваш кошик') }}</h1>
+    
+    {% if cart_items %}
+    <div class="row">
+        <div class="col-md-8">
+            {% for item in cart_items %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            {% if item.menu_item.image_path %}
+                            <img src="{{ item.menu_item.image_path }}" class="img-fluid rounded" alt="{{ item.menu_item.name }}" style="height: 120px; object-fit: cover;">
+                            {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center rounded" style="height: 120px;">
+                                <span class="text-muted">{{ t('Немає зображення') }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-5">
+                            <h5>{{ t(item.menu_item.name) }}</h5>
+                            <p class="text-muted">
+                                {% if item.menu_item.description %}
+                                    {{ t(item.menu_item.description) }}
+                                {% else %}
+                                    {{ t('Смачна страва японської кухні') }}
+                                {% endif %}
+                            </p>
+                            <small class="text-muted">ID: {{ item.id }}</small>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex flex-column align-items-end">
+                                <span class="fw-bold h5">₴{{ "%.2f"|format(item.total_price) }}</span>
+                                
+                                <form method="POST" action="{{ url_for('orders.update_cart', order_id=item.id) }}" class="mt-2 mb-2">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text">{{ t('Кількість') }}:</span>
+                                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control" style="width: 70px;">
+                                        <button type="submit" class="btn btn-outline-primary">{{ t('Оновити') }}</button>
+                                    </div>
+                                </form>
+                                
+                                <a href="{{ url_for('orders.cancel_order', order_id=item.id) }}" 
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm(`{{ t('Ви впевнені, що хочете скасувати це замовлення') }}?`)">
+                                    ❌ {{ t('Скасувати') }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ t('Підсумок') }}</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>{{ t('Всього товарів') }}:</span>
+                        <span>{{ cart_items|length }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>{{ t('Загальна сума') }}:</strong>
+                        <strong>₴{{ "%.2f"|format(total) }}</strong>
+                    </div>
+                    <form method="POST" action="{{ url_for('orders.checkout') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-success w-100">✅ {{ t('Оформити замовлення') }}</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6>💡 {{ t('Інформація') }}</h6>
+                    <small class="text-muted">
+                        • {{ t('Натисніть "Оновити" для зміни кількості') }}<br>
+                        • {{ t('Натисніть "Скасувати" для видалення товару') }}<br>
+                        • {{ t('Після оформлення скасування буде неможливе') }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center my-5">
+        <h3>{{ t('Кошик порожній') }}</h3>
+        <p>{{ t('Перейдіть до меню щоб додати страви') }}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock content %}

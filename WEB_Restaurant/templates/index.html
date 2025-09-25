@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('Головна') }} - {{ t('Суши-бар - IZI') }}{% endblock title %}
+
+{% block content %}
+<div class="text-center my-5">
+    <h1 class="display-4">{{ t('Ласкаво просимо до суши-бару IZI') }}</h1>
+    <p class="lead">{{ t('Найсвіжіші суши та роли у вашому місті') }}</p>
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">🍣 {{ t('Свіжі інгредієнти') }}</h5>
+                    <p class="card-text">{{ t('Щодня готуємо з найсвіжіших морепродуктів') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">🚀 {{ t('Швидке приготування') }}</h5>
+                    <p class="card-text">{{ t('Ваше замовлення буде готове за 20-30 хвилин') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">🎯 {{ t('Доставка та самовивіз') }}</h5>
+                    <p class="card-text">{{ t('Зручні способи отримання замовлення') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if not current_user.is_authenticated %}
+    <div class="mt-5">
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg mx-2">{{ t('Увійти') }}</a>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary btn-lg mx-2">{{ t('Зареєструватися') }}</a>
+    </div>
+    {% else %}
+    <div class="mt-5">
+        <div class="alert alert-info">
+            <h5>{{ t('Ви вже авторизовані') }}</h5>
+            <p>{{ t('Можете переглянути меню та зробити замовлення') }}</p>
+            {% if current_user.is_admin %}
+            <p>{{ t('Ви маєте права адміністратора') }}</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock content %}

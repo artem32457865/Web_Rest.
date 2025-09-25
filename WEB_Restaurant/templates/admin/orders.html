@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('Адмінпанель - Замовлення') }}{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">📦 {{ t('Управління замовленнями') }}</h1>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>{{ t('ID') }}</th>
+                    <th>{{ t('Користувач') }}</th>
+                    <th>{{ t('Страва') }}</th>
+                    <th>{{ t('Кількість') }}</th>
+                    <th>{{ t('Статус') }}</th>
+                    <th>{{ t('Дата') }}</th>
+                    <th>{{ t('Дії') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user.username }}</td>
+                    <td>{{ t(order.menu_item.name) }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>
+                        <span class="badge {% if order.status.name == 'PENDING' %}bg-warning {% elif order.status.name == 'CONFIRMED' %}bg-info {% elif order.status.name == 'COMPLETED' %}bg-success {% elif order.status.name == 'CANCELLED' %}bg-danger {% else %}bg-secondary{% endif %}">
+                            {{ t(order.status.value) }}
+                        </span>
+                    </td>
+                    <td>{{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin.update_order_status', order_id=order.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                {% for status in OrderStatus %}
+                                <option value="{{ status.name }}" {% if order.status.name == status.name %}selected{% endif %}>
+                                    {{ t(status.value) }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                        <a href="{{ url_for('admin.cancel_order', order_id=order.id) }}" 
+                           class="btn btn-sm btn-danger" 
+                           onclick="return confirm(`{{ t('Скасувати замовлення') }}?`)">
+                            {{ t('Скасувати') }}
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}

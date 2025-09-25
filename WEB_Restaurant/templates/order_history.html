@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('Історія замовлень') }} - {{ t('Суши-бар - IZI') }}{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">📋 {{ t('Історія замовлень') }}</h1>
+    {% if orders %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>{{ t('№') }}</th>
+                    <th>{{ t('Страва') }}</th>
+                    <th>{{ t('Кількість') }}</th>
+                    <th>{{ t('Сума') }}</th>
+                    <th>{{ t('Статус') }}</th>
+                    <th>{{ t('Дата') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ t(order.menu_item.name) }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>₴{{ "%.2f"|format(order.total_price) }}</td>
+                    <td>
+                        <span class="badge {% if order.status.name == 'PENDING' %}bg-warning {% elif order.status.name == 'CONFIRMED' %}bg-info {% elif order.status.name == 'COMPLETED' %}bg-success {% elif order.status.name == 'CANCELLED' %}bg-danger {% else %}bg-secondary{% endif %}">
+                            {{ t(order.status.value) }}
+                        </span>
+                    </td>
+                    <td>{{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center my-5">
+        <h3>{{ t('Замовлень ще немає') }}</h3>
+        <p>{{ t('Зробіть ваше перше замовлення в нашому меню') }}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock content %}

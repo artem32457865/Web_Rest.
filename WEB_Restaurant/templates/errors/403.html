@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}403 - Доступ заборонено{% endblock title %}
+{% block content %}
+<div class="container text-center my-5">
+    <h1 class="display-1 text-warning">403</h1>
+    <h2>Доступ заборонено</h2>
+    <p class="lead">У вас немає дозволу для перегляду цієї сторінки.</p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">Повернутися на головну</a>
+    {% if not current_user.is_authenticated %}
+    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary">Увійти</a>
+    {% endif %}
+</div>
+{% endblock content %}
