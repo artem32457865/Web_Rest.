@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}{{ t('Головна') }} - {{ t('Суши-бар - IZI') }}{% endblock title %}
+{% block title %}{{ t('Головна') }} - {{ t('Sushi Monsters') }}{% endblock title %}
 
 {% block content %}
 <div class="text-center my-5">
-    <h1 class="display-4">{{ t('Ласкаво просимо до суши-бару IZI') }}</h1>
+    <h1 class="display-4">{{ t('Ласкаво просимо до Sushi Monsters!') }}</h1>
+    <img src="{{ logo_image or url_for('static', filename='img/logo.png') }}" alt="SUSHI MONSTERS"  style="width: 400px; height: 400px;" class="d-inline-block align-text-top">
     <p class="lead">{{ t('Найсвіжіші суши та роли у вашому місті') }}</p>
     <div class="row mt-5">
         <div class="col-md-4">

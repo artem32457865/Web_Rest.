@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}{{ t('Адмінпанель - Налаштування') }}{% endblock title %}
+{% block content %}
+<div class="container">
+    <h1 class="my-4">⚙️ {{ t('Налаштування сайту') }}</h1>
+
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>{{ t('Фонові зображення') }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="main_background_image" class="form-label">{{ t('Головна сторінка') }}</label>
+                    <input type="text" class="form-control" id="main_background_image"
+                           name="main_background_image"
+                           value="{{ settings.main_background_image or '' }}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="menu_background_image" class="form-label">{{ t('Сторінка меню') }}</label>
+                    <input type="text" class="form-control" id="menu_background_image"
+                           name="menu_background_image"
+                           value="{{ settings.menu_background_image or '' }}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="admin_panel_background_image" class="form-label">{{ t('Сторінка адміністратора') }}</label>
+                    <input type="text" class="form-control" id="admin_panel_background_image"
+                           name="admin_panel_background_image"
+                           value="{{ settings.admin_panel_background_image or '' }}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="cart_background_image" class="form-label">{{ t('Кошик') }}</label>
+                    <input type="text" class="form-control" id="cart_background_image"
+                           name="cart_background_image"
+                           value="{{ settings.cart_background_image or '' }}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="order_history_background_image" class="form-label">{{ t('Історія замовлень') }}</label>
+                    <input type="text" class="form-control" id="order_history_background_image"
+                           name="order_history_background_image"
+                           value="{{ settings.order_history_background_image or '' }}">
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>{{ t('Логотипи') }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="logo_image" class="form-label">{{ t('Головний логотип') }}</label>
+                    <input type="text" class="form-control" id="logo_image"
+                           name="logo_image"
+                           value="{{ settings.logo_image or '' }}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="mini_logo_image" class="form-label">{{ t('Міні логотип (навігація)') }}</label>
+                    <input type="text" class="form-control" id="mini_logo_image"
+                           name="mini_logo_image"
+                           value="{{ settings.mini_logo_image or '' }}">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">💾 {{ t('Зберегти налаштування') }}</button>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">{{ t('Скасувати') }}</a>
+    </form>
+</div>
+{% endblock content %}

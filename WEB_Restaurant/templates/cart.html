@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ t('Кошик') }} - {{ t('Суши-бар - IZI') }}{% endblock title %}
+{% block title %}{{ t('Кошик') }} - {{ t('Sushi Monsters') }}{% endblock title %}
 
 {% block content %}
 <div class="container">
@@ -24,28 +24,24 @@
                         </div>
                         <div class="col-md-5">
                             <h5>{{ t(item.menu_item.name) }}</h5>
-                            <p class="text-muted">
-                                {% if item.menu_item.description %}
-                                    {{ t(item.menu_item.description) }}
-                                {% else %}
-                                    {{ t('Смачна страва японської кухні') }}
-                                {% endif %}
-                            </p>
+                            <p class="text-muted">{{ t(item.menu_item.description) or t("Смачна страва японської кухні") }}</p>
                             <small class="text-muted">ID: {{ item.id }}</small>
                         </div>
                         <div class="col-md-4">
                             <div class="d-flex flex-column align-items-end">
                                 <span class="fw-bold h5">₴{{ "%.2f"|format(item.total_price) }}</span>
                                 
+                                <!-- Форма для обновления количества -->
                                 <form method="POST" action="{{ url_for('orders.update_cart', order_id=item.id) }}" class="mt-2 mb-2">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <div class="input-group input-group-sm">
-                                        <span class="input-group-text">{{ t('Кількість') }}:</span>
+                                        <span class="input-group-text">{{ t('Кількість') }}</span>
                                         <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control" style="width: 70px;">
                                         <button type="submit" class="btn btn-outline-primary">{{ t('Оновити') }}</button>
                                     </div>
                                 </form>
                                 
+                                <!-- Кнопка отмены заказа -->
                                 <a href="{{ url_for('orders.cancel_order', order_id=item.id) }}" 
                                    class="btn btn-danger btn-sm"
                                    onclick="return confirm(`{{ t('Ви впевнені, що хочете скасувати це замовлення') }}?`)">
@@ -63,7 +59,7 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ t('Підсумок') }}</h5>
                     <div class="d-flex justify-content-between mb-2">
-                        <span>{{ t('Всього товарів') }}:</span>
+                        <span>{{ t('Всього товарів') }}</span>
                         <span>{{ cart_items|length }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
@@ -77,6 +73,7 @@
                 </div>
             </div>
             
+            <!-- Информация о корзине -->
             <div class="card mt-3">
                 <div class="card-body">
                     <h6>💡 {{ t('Інформація') }}</h6>
@@ -92,7 +89,7 @@
     {% else %}
     <div class="text-center my-5">
         <h3>{{ t('Кошик порожній') }}</h3>
-        <p>{{ t('Перейдіть до меню щоб додати страви') }}</p>
+        <p>{{t ('Перейдіть до') }} <a href="{{ url_for('orders.menu') }}">{{ t('меню')}}</a> {{ t('щоб додати страви') }}</p>
     </div>
     {% endif %}
 </div>

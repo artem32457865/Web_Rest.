@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}401 - Не авторизовано{% endblock title %}
+{% block title %}401 - {{ t('Не авторизовано') }}{% endblock title %}
 {% block content %}
 <div class="container text-center my-5">
     <h1 class="display-1 text-info">401</h1>
-    <h2>Не авторизовано</h2>
-    <p class="lead">Будь ласка, увійдіть в систему для доступу до цієї сторінки.</p>
-    <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Увійти</a>
-    <a href="{{ url_for('index') }}" class="btn btn-outline-primary">На головну</a>
+    <h2>{{ t('Не авторизовано') }}</h2>
+    <p class="lead">{{ t('Будь ласка, увійдіть в систему для доступу до цієї сторінки.') }}</p>
+    <a href="{{ url_for('auth.login') }}" class="btn btn-primary">{{ t('Увійти') }}</a>
+    <a href="{{ url_for('index') }}" class="btn btn-outline-primary">{{ t('На головну') }}</a>
 </div>
 {% endblock content %}

@@ -11,33 +11,25 @@ bp = Blueprint('orders', __name__)
 @bp.route("/menu")
 def menu():
     current_lang = session.get('language', 'uk')
-    from app import t, get_background_settings
-    
-    with Session() as session_db:
-        menu_items = session_db.query(Menu).filter(Menu.active == True).all()
+    from app import t
+
+    with Session() as db_session:
+        menu_items = db_session.query(Menu).filter(Menu.active == True).all()
         categories = sorted(list(set(item.category for item in menu_items if item.category)))
-    
-    images = get_background_settings()
-    
-    return render_template("menu.html", 
-                         menu_items=menu_items, 
-                         categories=categories,
-                         background_image=images.get('menu_background_image'),
-                         t=lambda key: t(key, current_lang),
-                         lang=current_lang)
+    return render_template("menu.html", menu_items=menu_items, categories=categories,t=lambda key: t(key, current_lang), lang=current_lang)
 
 @bp.route("/add_to_cart/<int:item_id>", methods=["POST"])
 @login_required
 def add_to_cart(item_id):
     quantity = int(request.form.get("quantity", 1))
     
-    with Session() as session_db:
-        menu_item = session_db.query(Menu).filter(Menu.id == item_id).first()
+    with Session() as db_session:
+        menu_item = db_session.query(Menu).filter(Menu.id == item_id).first()
         if not menu_item:
-            flash("Страву не знайдено", "error")
+            flash("dish_not_found", "error")
             return redirect(url_for("orders.menu"))
         
-        existing_order = session_db.query(Order).filter(
+        existing_order = db_session.query(Order).filter(
             Order.user_id == current_user.id,
             Order.menu_id == item_id,
             Order.status == OrderStatus.PENDING
@@ -53,23 +45,20 @@ def add_to_cart(item_id):
                 quantity=quantity,
                 total_price=menu_item.price * quantity
             )
-            session_db.add(new_order)
+            db_session.add(new_order)
         
-        session_db.commit()
-        current_lang = session.get('language', 'uk')
-        from app import t
-        flash(f"'{menu_item.name}' {t('додано до замовлення')}", "success")
+        db_session.commit()
+        flash("added_to_cart", "success")
         return redirect(url_for("orders.menu"))
-        
 
 @bp.route("/cart")
 @login_required
 def cart():
     current_lang = session.get('language', 'uk')
-    from app import t, get_background_settings
+    from app import t
     
-    with Session() as session_db:
-        cart_items = session_db.query(Order).options(
+    with Session() as db_session:
+        cart_items = db_session.query(Order).options(
             joinedload(Order.menu_item)
         ).filter(
             Order.user_id == current_user.id,
@@ -78,6 +67,7 @@ def cart():
         
         total = sum(item.total_price for item in cart_items)
         
+        from app import get_background_settings
         images = get_background_settings()
         
         return render_template("cart.html", 
@@ -91,77 +81,50 @@ def cart():
 @login_required
 def update_cart(order_id):
     quantity = int(request.form.get("quantity", 1))
-    current_lang = session.get('language', 'uk')
-    from app import t
-    
-    with Session() as session_db:
-        order = session_db.query(Order).filter(
+    with Session() as db_session:
+        order = db_session.query(Order).filter(
             Order.id == order_id,
             Order.user_id == current_user.id
         ).first()
         if order and quantity > 0:
             order.quantity = quantity
             order.total_price = order.menu_item.price * quantity
-            session_db.commit()
-            flash(t('Кількість оновлено'), "success")
+            db_session.commit()
+            flash("quantity_updated", "success")
         elif order and quantity == 0:
-            session_db.delete(order)
-            session_db.commit()
-            flash(t('Страву видалено з кошика'), "success")
+            db_session.delete(order)
+            db_session.commit()
+            flash("item_removed_from_cart", "success")
         return redirect(url_for("orders.cart"))
-
-@bp.route("/cancel_order/<int:order_id>")
-@login_required
-def cancel_order(order_id):
-    current_lang = session.get('language', 'uk')
-    from app import t
-    
-    with Session() as session_db:
-        order = session_db.query(Order).filter(
-            Order.id == order_id,
-            Order.user_id == current_user.id,
-            Order.status == OrderStatus.PENDING
-        ).first()
-        
-        if order:
-            session_db.delete(order)
-            session_db.commit()
-            flash(t('Замовлення скасовано'), "success")
-        else:
-            flash(t('Замовлення не знайдено або не може бути скасоване'), "error")
-    
-    return redirect(url_for("orders.cart"))
 
 @bp.route("/checkout", methods=["POST"])
 @login_required
 def checkout():
-    current_lang = session.get('language', 'uk')
-    from app import t
-    
-    with Session() as session_db:
-        pending_orders = session_db.query(Order).filter(
+    with Session() as db_session:
+        pending_orders = db_session.query(Order).filter(
             Order.user_id == current_user.id,
             Order.status == OrderStatus.PENDING
         ).all()
         for order in pending_orders:
             order.status = OrderStatus.CONFIRMED
-        session_db.commit()
-        flash(t('Замовлення оформлено'), "success")
+        db_session.commit()
+        flash("order_placed", "success")
         return redirect(url_for("orders.menu"))
 
 @bp.route("/order_history")
 @login_required
 def order_history():
     current_lang = session.get('language', 'uk')
-    from app import t, get_background_settings
+    from app import t
     
-    with Session() as session_db:
-        orders_list = session_db.query(Order).options(
+    with Session() as db_session:
+        orders_list = db_session.query(Order).options(
             joinedload(Order.menu_item)
         ).filter(
             Order.user_id == current_user.id
         ).order_by(Order.created_at.desc()).all()
         
+        from app import get_background_settings
         images = get_background_settings()
         
         return render_template("order_history.html", 
@@ -169,6 +132,25 @@ def order_history():
                              background_image=images.get('order_history_background_image'),
                              t=lambda key: t(key, current_lang),
                              lang=current_lang)
+    
+@bp.route("/cancel_order/<int:order_id>")
+@login_required
+def cancel_order(order_id):
+    with Session() as db_session:
+        order = db_session.query(Order).filter(
+            Order.id == order_id,
+            Order.user_id == current_user.id,
+            Order.status == OrderStatus.PENDING
+        ).first()
+        
+        if order:
+            db_session.delete(order)
+            db_session.commit()
+            flash("order_cancelled", "success")
+        else:
+            flash("order_cancel_error", "error")
+    
+    return redirect(url_for("orders.cart"))
 
 @bp.route('/menu')
 def show_menu():
@@ -179,11 +161,4 @@ def show_menu():
     cursor.execute("SELECT * FROM menu WHERE active = 1")
     menu_items = cursor.fetchall()
     conn.close()
-    
-    current_lang = session.get('language', 'uk')
-    from app import t
-    
-    return render_template('menu.html', 
-                         menu_items=menu_items,
-                         t=lambda key: t(key, current_lang),
-                         lang=current_lang)
+    return render_template('menu.html', menu_items=menu_items)

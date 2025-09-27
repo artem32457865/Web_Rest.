@@ -1,16 +1,16 @@
 {% extends "base.html" %}
-
 {% block title %}{{ t('Адмінпанель - Меню') }}{% endblock title %}
-
 {% block content %}
 <div class="container">
     <h1 class="my-4">🍣 {{ t('Управління меню') }}</h1>
+    
     <a href="{{ url_for('admin.add_menu_item') }}" class="btn btn-success mb-3">+ {{ t('Додати страву') }}</a>
+    
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>{{ t('ID') }}</th>
                     <th>{{ t('Назва страви') }}</th>
                     <th>{{ t('Ціна') }}</th>
                     <th>{{ t('Категорія') }}</th>
@@ -24,15 +24,15 @@
                     <td>{{ item.id }}</td>
                     <td>{{ t(item.name) }}</td>
                     <td>₴{{ "%.2f"|format(item.price) }}</td>
-                    <td>{{ t(item.category) if item.category else t('Без категорії') }}</td>
+                    <td>{{ t(item.category) or t("Без категорії") }}</td>
                     <td>
                         <span class="badge {% if item.active %}bg-success{% else %}bg-danger{% endif %}">
-                            {{ t('Активна') if item.active else t('Неактивна') }}
+                            {{ t("Активна") if item.active else t("Неактивна") }}
                         </span>
                     </td>
                     <td>
                         <a href="{{ url_for('admin.edit_menu_item', item_id=item.id) }}" class="btn btn-sm btn-warning">✏️</a>
-                        <a href="{{ url_for('admin.delete_menu_item', item_id=item.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Видалити страву?')">🗑️</a>
+                        <a href="{{ url_for('admin.delete_menu_item', item_id=item.id) }}" class="btn btn-sm btn-danger" onclick="return confirm(t('Видалити страву?'))">🗑️</a>
                     </td>
                 </tr>
                 {% endfor %}

@@ -1,10 +1,9 @@
 {% extends "base.html" %}
-
 {% block title %}{{ t('Адмінпанель - Головна') }}{% endblock title %}
-
 {% block content %}
 <div class="container">
     <h1 class="my-4">📊 {{ t('Панель управління') }}</h1>
+    
     <div class="row">
         <!-- Статистика -->
         <div class="col-md-4 mb-4">
@@ -15,6 +14,7 @@
                 </div>
             </div>
         </div>
+        
         <div class="col-md-4 mb-4">
             <div class="card text-white bg-warning">
                 <div class="card-body">
@@ -23,6 +23,7 @@
                 </div>
             </div>
         </div>
+        
         <div class="col-md-4 mb-4">
             <div class="card text-white bg-success">
                 <div class="card-body">
@@ -33,6 +34,7 @@
         </div>
     </div>
 
+    <!-- Быстрое меню админки -->
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -44,6 +46,12 @@
                         </a>
                         <a href="{{ url_for('admin.orders_management') }}" class="btn btn-success me-2">
                             📦 {{ t('Управління замовленнями') }}
+                        </a>
+                        <a href="{{ url_for('admin.users_management') }}" class="btn btn-info me-2">
+                        👥 {{ t('Управління користувачами') }}
+                        </a>
+                        <a href="{{ url_for('admin.site_settings') }}" class="btn btn-user me-2">
+                        ⚙️ {{ t('Налаштування сайту') }}
                         </a>
                     </div>
                 </div>

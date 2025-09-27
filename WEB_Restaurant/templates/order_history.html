@@ -1,10 +1,9 @@
 {% extends "base.html" %}
-
-{% block title %}{{ t('Історія замовлень') }} - {{ t('Суши-бар - IZI') }}{% endblock title %}
-
+{% block title %}{{ t('Історія замовлень') }} - {{ t('Sushi Monsters') }}{% endblock title %}
 {% block content %}
 <div class="container">
     <h1 class="my-4">📋 {{ t('Історія замовлень') }}</h1>
+    
     {% if orders %}
     <div class="table-responsive">
         <table class="table table-striped">
@@ -26,7 +25,12 @@
                     <td>{{ order.quantity }}</td>
                     <td>₴{{ "%.2f"|format(order.total_price) }}</td>
                     <td>
-                        <span class="badge {% if order.status.name == 'PENDING' %}bg-warning {% elif order.status.name == 'CONFIRMED' %}bg-info {% elif order.status.name == 'COMPLETED' %}bg-success {% elif order.status.name == 'CANCELLED' %}bg-danger {% else %}bg-secondary{% endif %}">
+                        <span class="badge 
+                            {% if order.status.name == 'PENDING' %}bg-warning
+                            {% elif order.status.name == 'CONFIRMED' %}bg-info
+                            {% elif order.status.name == 'COMPLETED' %}bg-success
+                            {% elif order.status.name == 'CANCELLED' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
                             {{ t(order.status.value) }}
                         </span>
                     </td>
@@ -39,7 +43,7 @@
     {% else %}
     <div class="text-center my-5">
         <h3>{{ t('Замовлень ще немає') }}</h3>
-        <p>{{ t('Зробіть ваше перше замовлення в нашому меню') }}</p>
+        <p>{{ t('Зробіть ваше перше замовлення в нашому') }} <a href="{{ url_for('orders.menu') }}">{{ t('меню') }}</a>!</p>
     </div>
     {% endif %}
 </div>

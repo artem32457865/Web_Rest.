@@ -1,25 +1,40 @@
 {% extends "base.html" %}
 
-{% block title %}{{ t('Меню') }} - {{ t('Суши-бар - IZI') }}{% endblock title %}
+{% block title %}{{ t('Меню') }} - {{ t('Sushi Monsters') }}{% endblock title %}
 
 {% block content %}
 <div class="container">
     <h1 class="text-center my-4">🍽️ {{ t('Наше меню') }}</h1>
-    
-    <div class="row mb-4">
+
+    <!-- Поле пошуку -->
+    <div class="row mb-3">
         <div class="col-12">
-            <div class="d-flex flex-wrap justify-content-center gap-2">
-                <button class="btn btn-outline-primary category-btn active" data-category="all">{{ t('Всі') }}</button>
-                {% for category in categories %}
-                <button class="btn btn-outline-primary category-btn" data-category="{{ category }}">{{ t(category) }}</button>
-                {% endfor %}
+            <div class="input-group">
+                <span class="input-group-text">🔍</span>
+                <input type="text" id="searchInput" class="form-control" placeholder="{{ t('Пошук страв...') }}">
             </div>
         </div>
     </div>
-    
+
+    <!-- Кнопки для фильтрации по категориям -->
+    <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <button class="btn btn-outline-primary category-btn active" data-category="all">{{ t('Всі') }}</button>
+                    {% for category in categories %}
+                    <button class="btn btn-outline-primary category-btn" data-category="{{ category }}">{{ t(category) }}</button>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+
     <div class="row" id="menu-items">
         {% for item in menu_items %}
-        <div class="col-md-6 col-lg-4 mb-4 menu-item" data-category="{{ item.category }}">
+        <div class="col-md-6 col-lg-4 mb-4 menu-item"
+             data-category="{{ item.category }}"
+             data-name="{{ item.name.lower() }}"
+             data-description="{{ (item.description or '').lower() }}">
             <div class="card h-100">
                 {% if item.image_path %}
                 <img src="{{ item.image_path }}" class="card-img-top" alt="{{ item.name }}">
@@ -28,15 +43,10 @@
                     <span class="text-muted">{{ t('Немає зображення') }}</span>
                 </div>
                 {% endif %}
+
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ t(item.name) }}</h5>
-                    <p class="card-text flex-grow-1">
-                        {% if item.description %}
-                            {{ t(item.description) }}
-                        {% else %}
-                            {{ t('Смачна страва японської кухні') }}
-                        {% endif %}
-                    </p>
+                    <p class="card-text flex-grow-1">{{ t(item.description) or t("Смачна страва японської кухні") }}</p>
                     <div class="d-flex justify-content-between align-items-center mt-auto">
                         <span class="fw-bold">₴{{ "%.2f"|format(item.price) }}</span>
                         {% if current_user.is_authenticated %}
@@ -56,28 +66,69 @@
         </div>
         {% endfor %}
     </div>
+
+    <div id="noResultsMessage" class="text-center my-5" style="display: none;">
+        <h3>{{ t('За вашим запитом нічого не знайдено') }}</h3>
+        <p>{{ t('Спробуйте змінити пошуковий запит або') }} <a href="#" id="resetSearch">{{ t('скинути фільтри') }}</a></p>
+    </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const categoryButtons = document.querySelectorAll('.category-btn');
-        const menuItems = document.querySelectorAll('.menu-item');
-        
-        categoryButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                categoryButtons.forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-                const category = this.getAttribute('data-category');
-                
-                menuItems.forEach(item => {
-                    if (category === 'all' || item.getAttribute('data-category') === category) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            });
+<script>document.addEventListener('DOMContentLoaded', function() {
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    const menuItems = document.querySelectorAll('.menu-item');
+    const searchInput = document.getElementById('searchInput');
+    const noResultsMessage = document.getElementById('noResultsMessage');
+    const resetSearchLink = document.getElementById('resetSearch');
+
+    function filterMenuItems() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const activeCategory = document.querySelector('.category-btn.active').getAttribute('data-category');
+
+        let visibleItemsCount = 0;
+
+        menuItems.forEach(item => {
+            const category = item.getAttribute('data-category');
+            const name = item.getAttribute('data-name');
+            const description = item.getAttribute('data-description');
+
+            const categoryMatch = activeCategory === 'all' || category === activeCategory;
+
+            const searchMatch = searchTerm === '' ||
+                              name.includes(searchTerm) ||
+                              description.includes(searchTerm);
+
+            if (categoryMatch && searchMatch) {
+                item.style.display = 'block';
+                visibleItemsCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        if (visibleItemsCount === 0) {
+            noResultsMessage.style.display = 'block';
+        } else {
+            noResultsMessage.style.display = 'none';
+        }
+    }
+
+    searchInput.addEventListener('input', filterMenuItems);
+
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            categoryButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            filterMenuItems();
         });
     });
+
+    resetSearchLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        searchInput.value = '';
+        categoryButtons.forEach(btn => btn.classList.remove('active'));
+        document.querySelector('.category-btn[data-category="all"]').classList.add('active');
+        filterMenuItems();
+    });
+});
 </script>
 {% endblock content %}

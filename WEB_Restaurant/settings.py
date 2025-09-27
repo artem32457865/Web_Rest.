@@ -5,6 +5,7 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 dotenv.load_dotenv()
 
+
 class DatabaseConfig:
     DATABASE_NAME = os.getenv("DATABASE_NAME", "restaurant_db")
     DB_USER = os.getenv("DB_USER", "postgres")
@@ -19,11 +20,13 @@ class DatabaseConfig:
     def uri_sqlite(self):
         return f"sqlite:///{self.DATABASE_NAME}.db"
 
+
 config = DatabaseConfig()
 
 # Змінюємо engine для використання SQLite
 engine = create_engine(config.uri_sqlite(), echo=True)  # Використовуємо SQLite
 Session = sessionmaker(bind=engine)
+
 
 class Base(DeclarativeBase):
     def create_db(self):
