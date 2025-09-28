@@ -17,6 +17,7 @@ class DatabaseConfig:
     def uri_postgres(self):
         return f"postgresql+psycopg2://{self.DB_USER}:{self.DB_PASSWORD}@localhost:5432/{self.DATABASE_NAME}"
 
+
     def uri_sqlite(self):
         return f"sqlite:///{self.DATABASE_NAME}.db"
 

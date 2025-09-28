@@ -6,11 +6,11 @@ from settings import Session
 from flask import Blueprint
 import re
 
-bp = Blueprint('auth', __name__)
+bp = Blueprint("auth", __name__)
 
 
 def is_valid_password(password):
-    """ Перевіряє, чи відповідає пароль вимогам """
+    """Перевіряє, чи відповідає пароль вимогам"""
     if len(password) < 8:
         return False, "password_too_short"
     if not re.search(r"\d", password):
@@ -42,7 +42,11 @@ def register():
         user = User(username=username, email=email, hash_password=hashed_password)
 
         with Session() as session_db:
-            existing_user = session_db.query(User).filter((User.username == username) | (User.email == email)).first()
+            existing_user = (
+                session_db.query(User)
+                .filter((User.username == username) | (User.email == email))
+                .first()
+            )
             if existing_user:
                 if existing_user.username == username:
                     flash("username_exists", "error")
