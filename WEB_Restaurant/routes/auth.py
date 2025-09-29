@@ -6,11 +6,11 @@ from settings import Session
 from flask import Blueprint
 import re
 
-bp = Blueprint("auth", __name__)
+bp = Blueprint('auth', __name__)
 
 
 def is_valid_password(password):
-    """Перевіряє, чи відповідає пароль вимогам"""
+    """ Перевіряє, чи відповідає пароль вимогам """
     if len(password) < 8:
         return False, "password_too_short"
     if not re.search(r"\d", password):
@@ -25,8 +25,13 @@ def is_valid_password(password):
 @bp.route("/register", methods=["GET", "POST"])
 def register():
     if current_user.is_authenticated:
+        current_lang = session.get('language', 'uk')
+        from app import t
         flash("already_logged_in", "info")
         return redirect(url_for("index"))
+
+    current_lang = session.get('language', 'uk')
+    from app import t
 
     if request.method == "POST":
         username = request.form.get("username")
@@ -36,37 +41,44 @@ def register():
 
         if not is_valid:
             flash(error_message, "error")
-            return render_template("auth/register.html")
+            return render_template("auth/register.html",
+                                   t=lambda key: t(key, current_lang),
+                                   lang=current_lang)
 
         hashed_password = generate_password_hash(password)
         user = User(username=username, email=email, hash_password=hashed_password)
 
         with Session() as session_db:
-            existing_user = (
-                session_db.query(User)
-                .filter((User.username == username) | (User.email == email))
-                .first()
-            )
+            existing_user = session_db.query(User).filter((User.username == username) | (User.email == email)).first()
             if existing_user:
                 if existing_user.username == username:
                     flash("username_exists", "error")
                 else:
                     flash("email_exists", "error")
-                return render_template("auth/register.html")
+                return render_template("auth/register.html",
+                                       t=lambda key: t(key, current_lang),
+                                       lang=current_lang)
 
             session_db.add(user)
             session_db.commit()
             flash("registration_success", "success")
             return redirect(url_for("auth.login"))
 
-    return render_template("auth/register.html")
+    return render_template("auth/register.html",
+                           t=lambda key: t(key, current_lang),
+                           lang=current_lang)
 
 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
+        current_lang = session.get('language', 'uk')
+        from app import t
         flash("already_logged_in", "info")
         return redirect(url_for("index"))
+
+    current_lang = session.get('language', 'uk')
+    from app import t
 
     if request.method == "POST":
         username = request.form.get("username")
@@ -80,12 +92,17 @@ def login():
 
         flash("invalid_credentials", "error")
 
-    return render_template("auth/login.html")
+    return render_template("auth/login.html",
+                           t=lambda key: t(key, current_lang),
+                           lang=current_lang)
 
 
 @bp.route("/logout")
 @login_required
 def logout():
+    current_lang = session.get('language', 'uk')
+    from app import t
+
     logout_user()
     flash("logout_success", "success")
     return redirect(url_for("index"))
